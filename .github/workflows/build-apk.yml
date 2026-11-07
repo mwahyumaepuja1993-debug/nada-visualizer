@@ -1,0 +1,43 @@
+
+name: Build Nada Visualizer APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - utama
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ambil kode proyek
+        uses: actions/checkout@v4
+
+      - name: Siapkan Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Siapkan Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Ekstrak proyek ZIP
+        run: |
+          unzip -q nada-visualizer-android-project.zip -d project
+
+      - name: Bangun APK Android
+        run: gradle -p project assembleDebug
+
+      - name: Simpan hasil APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Nada-Visualizer-APK
+          path: project/app/build/outputs/apk/debug/app-debug.apk
